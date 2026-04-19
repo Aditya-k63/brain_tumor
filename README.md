@@ -66,9 +66,9 @@ This section documents every major problem I hit while building this project, wr
 
 ### Problem 1 — Glioma Recall Was Only 65% on Test Set
 
-After all three training phases, the model achieved 91% validation accuracy. But when we tested on the actual test set, glioma recall dropped to just 65%. That means 35 out of every 100 glioma patients would be missed — completely unacceptable for a medical application.
+After all three training phases, the model achieved 91% validation accuracy. But when I tested on the actual test set, glioma recall dropped to just 65%. That means 35 out of every 100 glioma patients would be missed — completely unacceptable for a medical application.
 The confusion matrix showed 96 glioma cases being classified as meningioma, which makes sense visually — both tumors can look similar on MRI.
-Instead of using the default argmax (which picks the class with highest probability), we applied a custom glioma threshold of 0.30. If the model gives glioma even a 30% probability, we classify it as glioma. This boosted recall from 65% → 75%.
+Instead of using the default argmax (which picks the class with highest probability), I applied a custom glioma threshold of 0.30. If the model gives glioma even a 30% probability, I classify it as glioma. This boosted recall from 65% → 75%.
 
 ---
 
