@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+tensorflow
+pillow
+opencv-python-headless
+numpy
+python-multipart
+streamlit
+requests
+pillow
