@@ -1,6 +1,23 @@
 venv/
 __pycache__/
-*.keras
-*.h5
-*.zip
+*.pyc
+*.pyo
+*.pyd
+
 .env
+
+.ipynb_checkpoints/
+
+.DS_Store
+
+*.log
+
+dist/
+build/
+*.egg-info/
+
+.vscode/
+
+# Optional (enable later when using cloud storage)
+# *.keras
+# *.h5

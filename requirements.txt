@@ -2,9 +2,9 @@ fastapi
 uvicorn
 tensorflow
 pillow
-opencv-python-headless
+opencv-python
 numpy
 python-multipart
 streamlit
 requests
-pillow
+pytest
