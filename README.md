@@ -20,15 +20,17 @@ A deep learning project that classifies brain MRI scans into 4 categories — **
 
 ```
 brain-tumor-api/
-├── main.py                  # FastAPI backend
-├── app.py                   # Streamlit frontend
+├── main.py
+├── app.py
 ├── model/
 │   └── brain_tumor_final.keras
 ├── utils/
-│   ├── __init__.py
-│   ├── predict.py           # Prediction + threshold logic
-│   └── gradcam.py           # GradCAM heatmap generation
-└── requirements.txt
+├── requirements.txt
+├── Dockerfile               
+├── tests/                   
+│   └── test_api.py
+└── .github/workflows/
+    └── ci.yml
 ```
 
 ---
