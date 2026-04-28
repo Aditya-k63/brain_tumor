@@ -1,3 +1,4 @@
+
 venv/
 __pycache__/
 *.pyc
@@ -7,10 +8,13 @@ __pycache__/
 .env
 
 .ipynb_checkpoints/
+*.ipynb
 
 .DS_Store
 
+
 *.log
+
 
 dist/
 build/
@@ -18,6 +22,17 @@ build/
 
 .vscode/
 
-# Optional (enable later when using cloud storage)
-# *.keras
-# *.h5
+
+model/
+*.keras
+*.h5
+*.pt
+*.pth
+
+
+*.jpg
+*.jpeg
+*.png
+
+.git/
+.github/
