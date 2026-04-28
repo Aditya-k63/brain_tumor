@@ -9,3 +9,4 @@ streamlit
 requests
 pytest
 requests
+huggingface_hub
