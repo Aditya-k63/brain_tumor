@@ -1,4 +1,4 @@
-# ---------- Builder ----------
+
 FROM python:3.10-slim-bullseye AS builder
 WORKDIR /app
 
@@ -7,7 +7,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
-# ---------- Runtime ----------
+
 FROM python:3.10-slim-bullseye
 WORKDIR /app
 
@@ -31,6 +31,15 @@ COPY main.py .
 COPY app.py .
 COPY utils/ ./utils/
 
+
+RUN python -c "\
+from huggingface_hub import hf_hub_download; \
+hf_hub_download(\
+    repo_id='Aditya-k63/brain-tumor-model', \
+    filename='brain_tumor_final.keras', \
+    local_dir='model'\
+)"
+
 RUN useradd -m appuser && \
     chown -R appuser:appuser /app
 
@@ -41,3 +50,4 @@ EXPOSE 8000
 HEALTHCHECK CMD curl --fail http://localhost:8000/health || exit 1
 
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+`
