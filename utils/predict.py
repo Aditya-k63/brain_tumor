@@ -3,13 +3,17 @@ import tensorflow as tf
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from PIL import Image
 import io
+import os
 
 CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
 GLIOMA_THRESHOLD = 0.30
 
+os.environ["TF_KERAS"] = "1"
+
 def load_model(model_path: str):
     return tf.keras.models.load_model(
         model_path,
+        compile=False,
         safe_mode=False
     )
 
