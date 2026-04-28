@@ -1,38 +1,52 @@
 
+# Python
+
 venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
+
+# Environment
+
 .env
+
+
+# Jupyter
 
 .ipynb_checkpoints/
 *.ipynb
 
+
+# OS files
+
 .DS_Store
 
 
+# Logs
 *.log
 
-
+# Build
 dist/
 build/
 *.egg-info/
 
+
+# IDE
+
 .vscode/
 
 
-model/
-*.keras
-*.h5
-*.pt
-*.pth
-
+# Images / dataset
 
 *.jpg
 *.jpeg
 *.png
 
-.git/
-.github/
+# ML models
+# model/
+# *.keras
+# *.h5
+# *.pt
+# *.pth
