@@ -1,12 +1,10 @@
 fastapi
-uvicorn
-tensorflow
+uvicorn[standard]
+tensorflow-cpu
 pillow
-opencv-python
+opencv-python-headless
 numpy
 python-multipart
 streamlit
-requests
-pytest
 requests
 huggingface_hub
