@@ -45,7 +45,7 @@ if uploaded_file:
 
     with col1:
         st.subheader("Original MRI")
-        st.image(img, use_column_width=True)
+        st.image(img, use_container_width=True)
 
     with st.spinner("Analyzing MRI..."):
         try:
@@ -110,7 +110,7 @@ if uploaded_file:
     with col3:
         st.subheader("GradCAM Overlay")
         if gradcam_img:
-            st.image(gradcam_img, use_column_width=True)
+            st.image(gradcam_img, use_container_width=True)
         else:
             st.info("GradCAM not available")
 

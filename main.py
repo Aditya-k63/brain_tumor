@@ -19,18 +19,10 @@ model = None
 
 def ensure_model():
     if not os.path.exists(MODEL_PATH):
-        print(f"Model not found at {MODEL_PATH}, downloading...")
-        os.makedirs("model", exist_ok=True)
-        hf_hub_download(
-            repo_id=HF_REPO_ID,
-            filename="brain_tumor_final.keras",
-            local_dir="model",
-            token=os.environ.get("HF_TOKEN", None)
-        )
-        print("Model downloaded!")
-    else:
-        size = os.path.getsize(MODEL_PATH)
-        print(f"Model found at {MODEL_PATH} — size: {size} bytes")
+        raise RuntimeError(f"Model not found at {MODEL_PATH}. Build is broken.")
+    
+    size = os.path.getsize(MODEL_PATH)
+    print(f"Model found at {MODEL_PATH} — size: {size} bytes")
 
     return MODEL_PATH
 
