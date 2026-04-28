@@ -25,6 +25,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
+          no-cache: true
           tags: |
             adsharma14/brain-tumor:latest
             adsharma14/brain-tumor:${{ github.sha }}

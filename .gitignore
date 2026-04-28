@@ -1,28 +1,19 @@
-
 # Python
-
 venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-
 # Environment
-
 .env
 
-
 # Jupyter
-
 .ipynb_checkpoints/
 *.ipynb
 
-
-# OS files
-
+# OS
 .DS_Store
-
 
 # Logs
 *.log
@@ -32,25 +23,19 @@ dist/
 build/
 *.egg-info/
 
-
 # IDE
-
 .vscode/
 
+# Data (not code)
+data/
+datasets/
 
-# Images / dataset
-
-*.jpg
-*.jpeg
-*.png
-
-# ML models
-# model/
-# *.keras
-# *.h5
-# *.pt
-# *.pth
+# ML models (handled by Docker)
+model/
+*.keras
+*.h5
+*.pt
+*.pth
 
 # Debug files
 gradcam_debug.png
-test_glioma.jpg
