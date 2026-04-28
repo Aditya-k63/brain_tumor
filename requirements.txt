@@ -1,7 +1,6 @@
 fastapi
 uvicorn[standard]
 tensorflow-cpu==2.21.0
-keras==3.14.0
 numpy
 pillow
 opencv-python-headless
