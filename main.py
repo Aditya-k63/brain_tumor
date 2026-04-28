@@ -102,5 +102,5 @@ async def predict_with_gradcam(file: UploadFile = File(...)):
 # Local run (for testing only)
 
 if __name__ == "__main__":
-    port=int(os.environ.get("PORT",800))
+    port=int(os.environ.get("PORT",8000))
     uvicorn.run("main:app", host="0.0.0.0",port=port)
