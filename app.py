@@ -2,8 +2,10 @@ import streamlit as st
 import requests
 from PIL import Image
 import io
+import os
 
-API_URL = "http://localhost:8000"
+API_URL = os.environ.get("API_URL", "https://brain-tumor-latest-c2vy.onrender.com")
+
 
 st.set_page_config(
     page_title="Brain Tumor Classifier",
