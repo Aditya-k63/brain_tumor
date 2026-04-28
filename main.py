@@ -1,4 +1,5 @@
 import os
+import uvicorn
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -101,5 +102,5 @@ async def predict_with_gradcam(file: UploadFile = File(...)):
 # Local run (for testing only)
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port=int(os.environ.get("PORT",800))
+    uvicorn.run("main:app", host="0.0.0.0",port=port)
