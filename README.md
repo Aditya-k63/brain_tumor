@@ -99,6 +99,7 @@ I ran a threshold sweep from 0.10 to 0.50 and printed both glioma AND meningioma
 - Overall accuracy: 90%
 
 Both tumor classes above 80% — the best balanced outcome.
+
 ---
 
 ### Problem  — 4 GradCAM Heatmap Was Not Focusing on Tumor
