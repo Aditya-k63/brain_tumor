@@ -11,7 +11,7 @@ from utils.predict import load_model, predict
 from utils.gradcam import generate_gradcam
 
 MODEL_PATH = "model/brain_tumor_final.keras"
-HF_REPO_ID = "neurobyisshu/brain-tumor-model"
+HF_REPO_ID = "neuronsbyisshu/brain-tumor-model"
 
 model = None
 
