@@ -8,7 +8,10 @@ CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
 GLIOMA_THRESHOLD = 0.30
 
 def load_model(model_path: str):
-    return tf.keras.models.load_model(model_path)
+    return tf.keras.models.load_model(
+        model_path,
+        safe_mode=False
+    )
 
 def preprocess_image(image_bytes: bytes) -> np.ndarray:
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
