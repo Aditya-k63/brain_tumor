@@ -10,10 +10,13 @@ from keras.models import load_model as keras_load_model
 CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
 GLIOMA_THRESHOLD = 0.30
 
-os.environ["TF_KERAS"] = "1"
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
 def load_model(model_path: str):
-    return keras_load_model(model_path, compile=False)
+    return tf.keras.models.load_model(
+        model_path,
+        compile=False
+    )
 
 def preprocess_image(image_bytes: bytes) -> np.ndarray:
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
