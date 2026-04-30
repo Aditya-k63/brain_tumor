@@ -18,11 +18,17 @@ model = None
 
 
 def ensure_model():
+    print("DEBUG: Checking model path...")
+
     if not os.path.exists(MODEL_PATH):
-        raise RuntimeError(f"Model not found at {MODEL_PATH}. Build is broken.")
-    
-    size = os.path.getsize(MODEL_PATH)
-    print(f"Model found at {MODEL_PATH} — size: {size} bytes")
+        print(f" Model NOT FOUND at {MODEL_PATH}")
+        print("Listing /app directory:")
+        print(os.listdir("/app"))
+        return None
+
+    print(f" Model FOUND at {MODEL_PATH}")
+    print("Listing model directory:")
+    print(os.listdir("model"))
 
     return MODEL_PATH
 
@@ -31,15 +37,45 @@ def ensure_model():
 async def lifespan(app: FastAPI):
     global model
     try:
+        print("\n=== STARTUP DEBUG ===")
+
+        # STEP 1: Check model existence
         model_path = ensure_model()
-        print("Loading model into memory...")
-        model = load_model(model_path)
-        print(f"Model loaded successfully!")
+
+        if model_path is None:
+            print(" Model path is None — skipping load")
+            model = None
+        else:
+            print(f" Model path: {model_path}")
+
+            # Extra debug
+            if not os.path.exists(model_path):
+                print(" Model file DOES NOT exist!")
+                print(" /app contents:", os.listdir("/app"))
+                if os.path.exists("model"):
+                    print("model folder:", os.listdir("model"))
+                model = None
+            else:
+                size = os.path.getsize(model_path)
+                print(f" Model exists — size: {size} bytes")
+
+                print(" Loading model into memory...")
+
+                try:
+                    model = load_model(model_path)
+                    print(" MODEL LOADED SUCCESSFULLY")
+                except Exception as load_error:
+                    print(" MODEL LOAD FAILED:")
+                    traceback.print_exc()
+                    model = None
+
     except Exception as e:
-        print(f"ERROR loading model: {e}")
+        print(" STARTUP FAILED:")
         traceback.print_exc()
         model = None
+
     yield
+
     print("Shutting down")
 
 
