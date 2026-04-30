@@ -2,7 +2,6 @@ import numpy as np
 from keras.applications.efficientnet import preprocess_input
 from PIL import Image
 import io
-from keras.models import load_model as keras_load_model
 
 
 CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
@@ -10,8 +9,14 @@ GLIOMA_THRESHOLD = 0.30
 
 
 
+import tensorflow as tf
+
 def load_model(model_path: str):
-    return keras_load_model(model_path, compile=False)
+    return tf.keras.models.load_model(
+        model_path,
+        compile=False,
+        safe_mode=False
+    )
 
 
 def preprocess_image(image_bytes: bytes) -> np.ndarray:
