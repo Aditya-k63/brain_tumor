@@ -11,7 +11,7 @@ from huggingface_hub import hf_hub_download
 from utils.predict import load_model, predict
 from utils.gradcam import generate_gradcam
 
-MODEL_PATH = "model/brain_tumor_final_fixed.h5"
+MODEL_PATH = "model/brain_tumor_final.h5"
 HF_REPO_ID = "neuronsbyisshu/brain-tumor-model"
 
 model = None

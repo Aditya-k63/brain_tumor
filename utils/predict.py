@@ -1,15 +1,13 @@
 import numpy as np
 from keras.applications.efficientnet import preprocess_input
 from PIL import Image
+import tensorflow as tf
 import io
 
 
 CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
 GLIOMA_THRESHOLD = 0.30
 
-
-
-import tensorflow as tf
 
 def load_model(model_path: str):
     return tf.keras.models.load_model(
