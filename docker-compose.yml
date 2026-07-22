@@ -9,11 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      - API_URL=http://localhost:8000
       - PORT=8000
+      - RUN_STREAMLIT=true
+      - API_URL=http://localhost:8000
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
