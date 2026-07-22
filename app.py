@@ -4,7 +4,7 @@ from PIL import Image
 import io
 import os
 
-API_URL = os.environ.get("API_URL", "https://brain-tumor-latest-c2vy.onrender.com")
+API_URL = os.environ.get("API_URL", "http://localhost:8000")
 
 
 st.set_page_config(
