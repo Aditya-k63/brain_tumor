@@ -3,6 +3,7 @@ from keras.applications.efficientnet import preprocess_input
 from PIL import Image
 import tensorflow as tf
 import io
+import os
 
 
 CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
@@ -27,9 +28,25 @@ def build_model():
     return model
 
 
-def load_model(weights_path: str):
+def load_model(model_path: str):
+    if model_path.endswith(".weights.h5"):
+        model = build_model()
+        model.load_weights(model_path)
+        return model
+
+    try:
+        return tf.keras.models.load_model(model_path, compile=False)
+    except Exception:
+        pass
+
+    try:
+        import tf_keras
+        return tf_keras.models.load_model(model_path, compile=False)
+    except Exception:
+        pass
+
     model = build_model()
-    model.load_weights(weights_path)
+    model.load_weights(model_path)
     return model
 
 
