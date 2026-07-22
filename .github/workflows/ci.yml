@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
@@ -20,10 +20,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify app loads
+      - name: Verify imports
         env:
           TF_ENABLE_ONEDNN_OPTS: "0"
-        run: python -c "from utils.predict import load_model, predict; print('OK')"
+        run: python -c "from utils.predict import CLASS_NAMES; print('OK:', CLASS_NAMES)"
 
   docker-build:
     runs-on: ubuntu-latest
