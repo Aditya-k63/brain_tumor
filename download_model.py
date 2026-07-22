@@ -4,11 +4,20 @@ import os
 MODEL_DIR = "model"
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-model_path = hf_hub_download(
-    repo_id="neuronsbyisshu/brain-tumor-model",
-    filename="brain_tumor_final.keras",
-    local_dir=MODEL_DIR,
-    local_dir_use_symlinks=False
-)
-
-print(f"Model downloaded: {model_path}")
+# Try .weights.h5 first, fall back to .keras
+try:
+    model_path = hf_hub_download(
+        repo_id="neuronsbyisshu/brain-tumor-model",
+        filename="brain_tumor_final.weights.h5",
+        local_dir=MODEL_DIR,
+        local_dir_use_symlinks=False
+    )
+    print(f"Model downloaded: {model_path}")
+except Exception:
+    model_path = hf_hub_download(
+        repo_id="neuronsbyisshu/brain-tumor-model",
+        filename="brain_tumor_final.keras",
+        local_dir=MODEL_DIR,
+        local_dir_use_symlinks=False
+    )
+    print(f"Model downloaded (legacy): {model_path}")

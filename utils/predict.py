@@ -9,8 +9,28 @@ CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
 GLIOMA_THRESHOLD = 0.10
 
 
-def load_model(model_path: str):
-    return tf.keras.models.load_model(model_path, compile=False)
+def build_model():
+    base = tf.keras.applications.EfficientNetB0(
+        weights="imagenet",
+        include_top=False,
+        input_shape=(224, 224, 3)
+    )
+    base.trainable = False
+
+    x = base.output
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)
+    x = tf.keras.layers.Dense(256, activation="relu")(x)
+    x = tf.keras.layers.Dropout(0.3)(x)
+    output = tf.keras.layers.Dense(4, activation="softmax")(x)
+
+    model = tf.keras.Model(inputs=base.input, outputs=output)
+    return model
+
+
+def load_model(weights_path: str):
+    model = build_model()
+    model.load_weights(weights_path)
+    return model
 
 
 def preprocess_image(image_bytes: bytes) -> np.ndarray:
@@ -20,6 +40,7 @@ def preprocess_image(image_bytes: bytes) -> np.ndarray:
     img_array = preprocess_input(img_array)
     img_array = np.expand_dims(img_array, axis=0)
     return img_array
+
 
 def predict(model, image_bytes: bytes) -> dict:
     img_array = preprocess_image(image_bytes)
