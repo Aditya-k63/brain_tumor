@@ -27,6 +27,7 @@ RUN pip install --upgrade pip && \
 COPY main.py .
 COPY app.py .
 COPY utils/ ./utils/
+COPY static/ ./static/
 COPY download_model.py .
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
