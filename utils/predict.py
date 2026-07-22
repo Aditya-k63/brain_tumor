@@ -6,7 +6,7 @@ import io
 
 
 CLASS_NAMES = ["glioma", "meningioma", "notumor", "pituitary"]
-GLIOMA_THRESHOLD = 0.30
+GLIOMA_THRESHOLD = 0.10
 
 
 def load_model(model_path: str):
