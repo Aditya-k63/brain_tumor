@@ -6,7 +6,7 @@ import time
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Request
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import Response, JSONResponse, HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from typing import List
@@ -100,8 +100,11 @@ def validate_file(file: UploadFile, content: bytes):
         raise HTTPException(status_code=400, detail="Invalid or corrupt image file")
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home():
+    index_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
     return {"message": "Brain Tumor MRI Classifier API", "version": "2.0.0", "docs": "/docs"}
 
 

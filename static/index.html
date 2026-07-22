@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor MRI Classifier</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid #334155;
+            padding: 20px 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; font-weight: 700; color: #f8fafc; }
+        .header p { color: #94a3b8; margin-top: 6px; font-size: 14px; }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .upload-zone {
+            border: 2px dashed #475569;
+            border-radius: 16px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #1e293b;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #60a5fa;
+            background: #1e3a5f;
+        }
+        .upload-zone .icon { font-size: 48px; margin-bottom: 16px; }
+        .upload-zone p { color: #94a3b8; font-size: 16px; }
+        .upload-zone .hint { color: #64748b; font-size: 13px; margin-top: 8px; }
+        #fileInput { display: none; }
+        .preview {
+            margin-top: 24px;
+            display: none;
+        }
+        .preview img {
+            max-width: 300px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #2563eb; }
+        .btn:disabled { background: #475569; cursor: not-allowed; }
+        .result {
+            margin-top: 32px;
+            display: none;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 32px;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+        .result-card h3 { font-size: 14px; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .prediction-label {
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .glioma { color: #ef4444; }
+        .meningioma { color: #f97316; }
+        .notumor { color: #22c55e; }
+        .pituitary { color: #3b82f6; }
+        .confidence { font-size: 40px; font-weight: 700; color: #f8fafc; }
+        .prob-bar { margin-bottom: 10px; }
+        .prob-bar-label { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
+        .prob-bar-track {
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .prob-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+        .warning {
+            background: #78350f;
+            border: 1px solid #92400e;
+            color: #fbbf24;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .success-msg {
+            background: #064e3b;
+            border: 1px solid #065f46;
+            color: #6ee7b7;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .gradcam-img {
+            max-width: 100%;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            margin-top: 16px;
+        }
+        .spinner { display: none; text-align: center; margin-top: 20px; color: #94a3b8; }
+        .spinner.show { display: block; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .spinner.show { animation: pulse 1.5s infinite; }
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #475569;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Brain Tumor MRI Classifier</h1>
+        <p>EfficientNetB0 model — Upload an MRI scan for instant classification</p>
+    </div>
+
+    <div class="container">
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <div class="icon">🧠</div>
+            <p>Drop your MRI scan here or click to browse</p>
+            <div class="hint">Supports JPG, PNG — Max 10MB</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png">
+
+        <div class="preview" id="preview">
+            <img id="previewImg" alt="Preview">
+            <br>
+            <button class="btn" id="analyzeBtn" onclick="analyze()">Analyze MRI</button>
+        </div>
+
+        <div class="spinner" id="spinner">Analyzing MRI scan...</div>
+
+        <div class="result" id="result">
+            <div class="result-grid">
+                <div class="result-card">
+                    <h3>Prediction</h3>
+                    <div class="prediction-label" id="predLabel">—</div>
+                    <div id="msgBox"></div>
+                </div>
+                <div class="result-card">
+                    <h3>Confidence</h3>
+                    <div class="confidence" id="confValue">—</div>
+                </div>
+            </div>
+            <div class="result-card" style="margin-top: 16px;">
+                <h3>Class Probabilities</h3>
+                <div id="probBars"></div>
+            </div>
+            <div id="gradcamSection" style="display:none; margin-top: 16px;">
+                <div class="result-card">
+                    <h3>GradCAM Heatmap</h3>
+                    <img class="gradcam-img" id="gradcamImg" alt="GradCAM">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">Built with FastAPI + EfficientNetB0 + GradCAM</div>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const previewImg = document.getElementById('previewImg');
+        const spinner = document.getElementById('spinner');
+        const result = document.getElementById('result');
+        let selectedFile = null;
+
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) selectFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) selectFile(e.target.files[0]);
+        });
+
+        function selectFile(file) {
+            selectedFile = file;
+            previewImg.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+            result.style.display = 'none';
+        }
+
+        const colorMap = { glioma: '#ef4444', meningioma: '#f97316', notumor: '#22c55e', pituitary: '#3b82f6' };
+
+        async function analyze() {
+            if (!selectedFile) return;
+            document.getElementById('analyzeBtn').disabled = true;
+            spinner.classList.add('show');
+            result.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const predRes = await fetch('/predict', { method: 'POST', body: formData });
+                if (!predRes.ok) throw new Error((await predRes.json()).detail || 'Prediction failed');
+                const pred = await predRes.json();
+
+                const gradRes = await fetch('/predict/gradcam', { method: 'POST', body: formData });
+                let hasGradcam = gradRes.ok;
+                let gradcamBlob = hasGradcam ? await gradRes.blob() : null;
+
+                spinner.classList.remove('show');
+                result.style.display = 'block';
+
+                const label = document.getElementById('predLabel');
+                label.textContent = pred.predicted_class;
+                label.className = 'prediction-label ' + pred.predicted_class;
+                document.getElementById('confValue').textContent = pred.confidence + '%';
+
+                const msgBox = document.getElementById('msgBox');
+                if (pred.predicted_class !== 'notumor') {
+                    msgBox.innerHTML = '<div class="warning">Tumor detected. Please consult a medical professional.</div>';
+                } else {
+                    msgBox.innerHTML = '<div class="success-msg">No tumor detected.</div>';
+                }
+
+                const barsEl = document.getElementById('probBars');
+                barsEl.innerHTML = '';
+                const sorted = Object.entries(pred.probabilities).sort((a, b) => b[1] - a[1]);
+                for (const [cls, prob] of sorted) {
+                    barsEl.innerHTML += `
+                        <div class="prob-bar">
+                            <div class="prob-bar-label">
+                                <span style="color:${colorMap[cls]}">${cls}</span>
+                                <span>${prob}%</span>
+                            </div>
+                            <div class="prob-bar-track">
+                                <div class="prob-bar-fill" style="width:${prob}%;background:${colorMap[cls]}"></div>
+                            </div>
+                        </div>`;
+                }
+
+                if (hasGradcam) {
+                    document.getElementById('gradcamSection').style.display = 'block';
+                    document.getElementById('gradcamImg').src = URL.createObjectURL(gradcamBlob);
+                }
+            } catch (err) {
+                spinner.classList.remove('show');
+                alert('Error: ' + err.message);
+            }
+            document.getElementById('analyzeBtn').disabled = false;
+        }
+    </script>
+</body>
+</html>
