@@ -6,9 +6,9 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 
 model_path = hf_hub_download(
     repo_id="neuronsbyisshu/brain-tumor-model",
-    filename="brain_tumor_final.h5",
+    filename="brain_tumor_final.keras",
     local_dir=MODEL_DIR,
     local_dir_use_symlinks=False
 )
 
-print(f"Model downloaded")
+print(f"Model downloaded: {model_path}")

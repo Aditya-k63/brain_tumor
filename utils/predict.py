@@ -10,11 +10,7 @@ GLIOMA_THRESHOLD = 0.30
 
 
 def load_model(model_path: str):
-    return tf.keras.models.load_model(
-        model_path,
-        compile=False,
-        safe_mode=False
-    )
+    return tf.keras.models.load_model(model_path, compile=False)
 
 
 def preprocess_image(image_bytes: bytes) -> np.ndarray:
@@ -27,9 +23,8 @@ def preprocess_image(image_bytes: bytes) -> np.ndarray:
 
 def predict(model, image_bytes: bytes) -> dict:
     img_array = preprocess_image(image_bytes)
-    preds = model.predict(img_array)[0]
+    preds = model.predict(img_array, verbose=0)[0]
 
-    # apply glioma threshold
     if preds[0] >= GLIOMA_THRESHOLD:
         predicted_class = 0
     else:

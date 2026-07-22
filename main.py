@@ -21,7 +21,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-MODEL_PATH = os.getenv("MODEL_PATH", "model/brain_tumor_final.h5")
+MODEL_PATH = os.getenv("MODEL_PATH", "model/brain_tumor_final.keras")
 HF_REPO_ID = os.getenv("HF_REPO_ID", "neuronsbyisshu/brain-tumor-model")
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 MIN_CONFIDENCE = float(os.getenv("MIN_CONFIDENCE", "0.40"))
