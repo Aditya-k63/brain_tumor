@@ -99,15 +99,10 @@ def validate_file(file: UploadFile, content: bytes):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid or corrupt image file")
 
-    # Check if image looks like a brain MRI
+    # Reject clearly invalid inputs (color photos, blank images)
     ood_check = validate_image(content)
     if not ood_check["ok"]:
-        raise HTTPException(status_code=400, detail=f"Not a brain MRI: {ood_check['reason']}")
-
-    # Check if image looks like a brain MRI
-    ood_check = validate_image(content)
-    if not ood_check["ok"]:
-        raise HTTPException(status_code=400, detail=f"Not a brain MRI: {ood_check['reason']}")
+        raise HTTPException(status_code=400, detail=f"Invalid image: {ood_check['reason']}")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -146,12 +141,6 @@ async def predict_tumor(file: UploadFile = File(...)):
     if result["confidence"] < MIN_CONFIDENCE * 100:
         result["warning"] = f"Low confidence prediction ({result['confidence']}%). Treat with caution."
         result["below_threshold"] = True
-
-    if result.get("is_ood"):
-        result["predicted_class"] = "unknown"
-        result["confidence"] = round(float(result["max_probability"]), 2)
-        result["ood_reason"] = result.get("ood_reason", "OOD detected by feature analysis")
-        result["warning"] = result.get("warning", "This image does not appear to be a brain MRI. Results are unreliable.")
 
     result["filename"] = file.filename
     result["model_version"] = "2.0.0"

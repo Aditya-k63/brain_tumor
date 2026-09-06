@@ -93,11 +93,11 @@ if uploaded_file:
         st.metric("Confidence", f"{confidence}%")
 
         if result.get("is_ood"):
-            st.error("⚠ Out-of-Distribution Detected — this image may not be a brain MRI. Results are unreliable.")
+            st.warning("⚠ Low confidence — this image may not be a brain MRI")
 
-        if predicted != "notumor" and not result.get("is_ood"):
+        if predicted != "notumor":
             st.warning(" Tumor detected. Please consult a medical professional.")
-        elif not result.get("is_ood"):
+        else:
             st.success("No tumor detected.")
 
         st.divider()
@@ -112,9 +112,7 @@ if uploaded_file:
 
     with col3:
         st.subheader("GradCAM Overlay")
-        if result.get("is_ood"):
-            st.info("Skipping GradCAM — image does not appear to be a brain MRI")
-        elif gradcam_img:
+        if gradcam_img:
             st.image(gradcam_img, use_container_width=True)
         else:
             st.info("GradCAM not available")

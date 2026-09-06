@@ -243,9 +243,7 @@
             previewImg.src = URL.createObjectURL(file);
             preview.style.display = 'block';
             result.style.display = 'none';
-            // Reset OOD warning
-            document.getElementById('oodWarning').style.display = 'none';
-            document.getElementById('oodWarning').innerHTML = '';
+            clearResults();
         }
 
         const colorMap = { glioma: '#ef4444', meningioma: '#f97316', notumor: '#22c55e', pituitary: '#3b82f6' };
@@ -281,18 +279,12 @@
                 let hasGradcam = false;
                 let gradcamBlob = null;
 
-                if (pred.is_ood) {
-                    // Don't waste time on GradCAM for non-brain images
-                    spinner.classList.remove('show');
-                    result.style.display = 'block';
-                } else {
-                    const gradRes = await fetch('/predict/gradcam', { method: 'POST', body: formData });
-                    hasGradcam = gradRes.ok;
-                    gradcamBlob = hasGradcam ? await gradRes.blob() : null;
+                const gradRes = await fetch('/predict/gradcam', { method: 'POST', body: formData });
+                hasGradcam = gradRes.ok;
+                gradcamBlob = hasGradcam ? await gradRes.blob() : null;
 
-                    spinner.classList.remove('show');
-                    result.style.display = 'block';
-                }
+                spinner.classList.remove('show');
+                result.style.display = 'block';
 
                 // --- Prediction label ---
                 const label = document.getElementById('predLabel');
