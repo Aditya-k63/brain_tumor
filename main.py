@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from typing import List
 
-from utils.predict import load_model, predict, CLASS_NAMES
+from utils.predict import load_model, predict, CLASS_NAMES, validate_image
 from utils.gradcam import generate_gradcam
 
 logging.basicConfig(
@@ -98,6 +98,11 @@ def validate_file(file: UploadFile, content: bytes):
         img.verify()
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid or corrupt image file")
+
+    # Check if image looks like a brain MRI
+    ood_check = validate_image(content)
+    if not ood_check["ok"]:
+        raise HTTPException(status_code=400, detail=f"Not a brain MRI: {ood_check['reason']}")
 
 
 @app.get("/", response_class=HTMLResponse)

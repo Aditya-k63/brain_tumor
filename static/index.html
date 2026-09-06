@@ -118,6 +118,18 @@
             margin-top: 16px;
             font-size: 14px;
         }
+        .ood-warning {
+            background: #450a0a;
+            border: 1px solid #7f1d1d;
+            color: #fca5a5;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .ood-warning strong {
+            color: #ef4444;
+        }
         .success-msg {
             background: #064e3b;
             border: 1px solid #065f46;
@@ -142,6 +154,16 @@
             padding: 40px 20px;
             color: #475569;
             font-size: 13px;
+        }
+        .stale-banner {
+            display: none;
+            background: #713f12;
+            border: 1px solid #92400e;
+            color: #fbbf24;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -173,6 +195,7 @@
                     <h3>Prediction</h3>
                     <div class="prediction-label" id="predLabel">—</div>
                     <div id="msgBox"></div>
+                    <div id="oodWarning" class="ood-warning" style="display:none;"></div>
                 </div>
                 <div class="result-card">
                     <h3>Confidence</h3>
@@ -220,9 +243,24 @@
             previewImg.src = URL.createObjectURL(file);
             preview.style.display = 'block';
             result.style.display = 'none';
+            // Reset OOD warning
+            document.getElementById('oodWarning').style.display = 'none';
+            document.getElementById('oodWarning').innerHTML = '';
         }
 
         const colorMap = { glioma: '#ef4444', meningioma: '#f97316', notumor: '#22c55e', pituitary: '#3b82f6' };
+
+        function clearResults() {
+            document.getElementById('predLabel').textContent = '—';
+            document.getElementById('predLabel').className = 'prediction-label';
+            document.getElementById('msgBox').innerHTML = '';
+            document.getElementById('confValue').textContent = '—';
+            document.getElementById('probBars').innerHTML = '';
+            document.getElementById('oodWarning').style.display = 'none';
+            document.getElementById('oodWarning').innerHTML = '';
+            document.getElementById('gradcamSection').style.display = 'none';
+            document.getElementById('gradcamImg').src = '';
+        }
 
         async function analyze() {
             if (!selectedFile) return;
@@ -234,33 +272,57 @@
             formData.append('file', selectedFile);
 
             try {
+                clearResults();
+
                 const predRes = await fetch('/predict', { method: 'POST', body: formData });
                 if (!predRes.ok) throw new Error((await predRes.json()).detail || 'Prediction failed');
                 const pred = await predRes.json();
 
-                const gradRes = await fetch('/predict/gradcam', { method: 'POST', body: formData });
-                let hasGradcam = gradRes.ok;
-                let gradcamBlob = hasGradcam ? await gradRes.blob() : null;
+                let hasGradcam = false;
+                let gradcamBlob = null;
 
-                spinner.classList.remove('show');
-                result.style.display = 'block';
+                if (pred.is_ood) {
+                    // Don't waste time on GradCAM for non-brain images
+                    spinner.classList.remove('show');
+                    result.style.display = 'block';
+                } else {
+                    const gradRes = await fetch('/predict/gradcam', { method: 'POST', body: formData });
+                    hasGradcam = gradRes.ok;
+                    gradcamBlob = hasGradcam ? await gradRes.blob() : null;
 
+                    spinner.classList.remove('show');
+                    result.style.display = 'block';
+                }
+
+                // --- Prediction label ---
                 const label = document.getElementById('predLabel');
                 label.textContent = pred.predicted_class;
                 label.className = 'prediction-label ' + pred.predicted_class;
                 document.getElementById('confValue').textContent = pred.confidence + '%';
 
+                // --- Message box ---
                 const msgBox = document.getElementById('msgBox');
-                if (pred.predicted_class !== 'notumor') {
+                if (pred.is_ood) {
+                    msgBox.innerHTML = '<div class="warning">Low-confidence prediction — this image may not be a brain MRI.</div>';
+                } else if (pred.predicted_class !== 'notumor') {
                     msgBox.innerHTML = '<div class="warning">Tumor detected. Please consult a medical professional.</div>';
                 } else {
                     msgBox.innerHTML = '<div class="success-msg">No tumor detected.</div>';
                 }
 
+                // --- OOD warning banner ---
+                const oodWarning = document.getElementById('oodWarning');
+                if (pred.is_ood) {
+                    oodWarning.style.display = 'block';
+                    oodWarning.innerHTML = '<strong>⚠ Out-of-Distribution Detected</strong><br>This image does not appear to be a brain MRI. The prediction may be unreliable.';
+                }
+
+                // --- Probability bars ---
                 const barsEl = document.getElementById('probBars');
                 barsEl.innerHTML = '';
                 const sorted = Object.entries(pred.probabilities).sort((a, b) => b[1] - a[1]);
                 for (const [cls, prob] of sorted) {
+                    const barClass = cls === 'glioma' ? 'glioma' : cls === 'meningioma' ? 'meningioma' : cls === 'notumor' ? 'notumor' : 'pituitary';
                     barsEl.innerHTML += `
                         <div class="prob-bar">
                             <div class="prob-bar-label">
@@ -273,7 +335,8 @@
                         </div>`;
                 }
 
-                if (hasGradcam) {
+                // --- GradCAM ---
+                if (hasGradcam && !pred.is_ood) {
                     document.getElementById('gradcamSection').style.display = 'block';
                     document.getElementById('gradcamImg').src = URL.createObjectURL(gradcamBlob);
                 }

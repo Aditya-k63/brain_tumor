@@ -25,8 +25,8 @@ with st.sidebar:
     - 🟢 No Tumor
     - 🔵 Pituitary
     
-    **Glioma threshold:** 0.30  
-    *(tuned for higher recall in medical context)*
+    **Glioma threshold:** 0.10  
+    *(boosts glioma recall, only when competitive with top class)*
     """)
     st.divider()
     st.caption("Built with FastAPI + TensorFlow + Streamlit")
@@ -92,12 +92,34 @@ if uploaded_file:
         st.markdown(f"### {color_map[predicted]} {predicted.upper()}")
         st.metric("Confidence", f"{confidence}%")
 
-        if predicted != "notumor":
+        if result.get("is_ood"):
+            st.error("⚠ Out-of-Distribution Detected — this image may not be a brain MRI. Results are unreliable.")
+
+        if predicted != "notumor" and not result.get("is_ood"):
             st.warning(" Tumor detected. Please consult a medical professional.")
-        else:
+        elif not result.get("is_ood"):
             st.success("No tumor detected.")
 
         st.divider()
+        st.subheader("All Probabilities")
+
+        probs = result["probabilities"]
+        for cls, prob in sorted(probs.items(), key=lambda x: -x[1]):
+            st.progress(
+                prob / 100,
+                text=f"{color_map[cls]} {cls}: {prob}%"
+            )
+
+    with col3:
+        st.subheader("GradCAM Overlay")
+        if result.get("is_ood"):
+            st.info("Skipping GradCAM — image does not appear to be a brain MRI")
+        elif gradcam_img:
+            st.image(gradcam_img, use_container_width=True)
+        else:
+            st.info("GradCAM not available")
+
+    st.divider()
         st.subheader("All Probabilities")
 
         probs = result["probabilities"]
