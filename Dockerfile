@@ -7,13 +7,15 @@ ENV PYTHONUNBUFFERED=1
 ENV TF_ENABLE_ONEDNN_OPTS=0
 ENV RUN_STREAMLIT=false
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
     build-essential \
     gcc \
+    ca-certificates \
+    wget \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
-    libxrender-dev \
+    libxrender1 \
     libgomp1 \
     curl \
     supervisor \
