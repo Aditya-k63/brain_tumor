@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM python:3.10-slim
 
 WORKDIR /app
 
@@ -8,18 +8,11 @@ ENV TF_ENABLE_ONEDNN_OPTS=0
 ENV RUN_STREAMLIT=false
 
 RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
-    build-essential \
-    gcc \
-    ca-certificates \
-    wget \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender1 \
     libgomp1 \
-    curl \
-    supervisor \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -31,12 +24,11 @@ COPY app.py .
 COPY utils/ ./utils/
 COPY static/ ./static/
 COPY download_model.py .
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN mkdir -p /var/log/supervisor
 
 RUN useradd -m appuser && \
-    chown -R appuser:appuser /app /var/log/supervisor
+    chown -R appuser:appuser /app
 
 USER appuser
 
@@ -46,4 +38,4 @@ EXPOSE 8000
 
 HEALTHCHECK CMD curl --fail http://localhost:8000/health || exit 1
 
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
